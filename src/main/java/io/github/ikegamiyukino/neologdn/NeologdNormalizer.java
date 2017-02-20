@@ -138,9 +138,9 @@ public class NeologdNormalizer {
         for (int i = 0; i < sentence.length(); ++i) {
             char current = sentence.charAt(i);
 
-            if (current == ' ' | current == '　') {
+            if (current == ' ' || current == '　') {
                 current = ' ';
-                if (prev == ' ' | jpChars.contains(prev)) {
+                if (prev == ' ' || jpChars.contains(prev)) {
                     continue;
                 } else if (prev != '*' && i > 0 && basicLatin.contains(prev)) {
                     latinSpace = true;
@@ -196,14 +196,11 @@ public class NeologdNormalizer {
     public static Set<Character> buildJpCharsBlock() {
 
         Set<Character> jpChars = new HashSet<Character>();
-        jpChars = addCharsFromRange(jpChars, 19968, 40959); // CJK UNIFIED
-                                                           // IDEOGRAPHS
-        jpChars = addCharsFromRange(jpChars, 12352, 12447); // HIRAGANA
-        jpChars = addCharsFromRange(jpChars, 12448, 12543); // KATAKANA
-        jpChars = addCharsFromRange(jpChars, 12289, 12351); // CJK SYMBOLS AND
-                                                           // PUNCTUATION
-        jpChars = addCharsFromRange(jpChars, 65280, 65519); // HALFWIDTH AND
-                                                           // FULLWIDTH FORMS
+        addCharsFromRange(jpChars, 19968, 40959); // CJK UNIFIED IDEOGRAPHS
+        addCharsFromRange(jpChars, 12352, 12447); // HIRAGANA
+        addCharsFromRange(jpChars, 12448, 12543); // KATAKANA
+        addCharsFromRange(jpChars, 12289, 12351); // CJK SYMBOLS AND PUNCTUATION
+        addCharsFromRange(jpChars, 65280, 65519); // HALFWIDTH AND FULLWIDTH FORMS
         return jpChars;
     }
 
