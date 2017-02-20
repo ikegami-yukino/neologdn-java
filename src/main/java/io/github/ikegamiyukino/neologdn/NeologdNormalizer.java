@@ -2,14 +2,17 @@ package io.github.ikegamiyukino.neologdn;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class NeologdNormalizer {
     private static final char[] HIPHENS = { '˗', '֊', '‐', '‑', '‒', '–', '⁃', '⁻', '₋', '−' };
     private static final char[] CHOONPUS = { '﹣', '－', 'ｰ', '—', '―', '─', '━', 'ー' };
     private static final char[] TILDES = { '~', '∼', '∾', '〜', '〰', '～' };
-    HashSet<Character> jpChars, basicLatin, hiphens, choonpus, tildes;
 
-    HashMap<Character, Character> conversion_map = new HashMap<Character, Character>() {
+    Set<Character> jpChars, basicLatin, hiphens, choonpus, tildes;
+
+    Map<Character, Character> conversion_map = new HashMap<Character, Character>() {
         {
             int halfwidthOffset = 33; // !
             int fullwidthOffset = 65281; // ！
@@ -83,7 +86,7 @@ public class NeologdNormalizer {
             put('ｰ', 'ー');
         }
     };
-    HashMap<Character, Character> kana_ten_map = new HashMap<Character, Character>() {
+    Map<Character, Character> kana_ten_map = new HashMap<Character, Character>() {
         {
             put('カ', 'ガ');
             put('キ', 'ギ');
@@ -108,7 +111,7 @@ public class NeologdNormalizer {
             put('ウ', 'ヴ');
         }
     };
-    HashMap<Character, Character> kana_maru_map = new HashMap<Character, Character>() {
+    Map<Character, Character> kana_maru_map = new HashMap<Character, Character>() {
         {
             put('ハ', 'パ');
             put('ヒ', 'ピ');
@@ -182,7 +185,7 @@ public class NeologdNormalizer {
         return result;
     }
 
-    public static HashSet<Character> addCharsFromRange(HashSet<Character> charSet, int start, int end) {
+    public static Set<Character> addCharsFromRange(Set<Character> charSet, int start, int end) {
         for (int i = start; i <= end; ++i) {
             String c = new String(new int[] { i }, 0, 1);
             charSet.add(c.charAt(0));
@@ -190,8 +193,9 @@ public class NeologdNormalizer {
         return charSet;
     }
 
-    public static HashSet<Character> buildJpCharsBlock() {
-        HashSet<Character> jpChars = new HashSet<>();
+    public static Set<Character> buildJpCharsBlock() {
+
+        Set<Character> jpChars = new HashSet<>();
         jpChars = addCharsFromRange(jpChars, 19968, 40959); // CJK UNIFIED
                                                            // IDEOGRAPHS
         jpChars = addCharsFromRange(jpChars, 12352, 12447); // HIRAGANA
@@ -203,8 +207,8 @@ public class NeologdNormalizer {
         return jpChars;
     }
 
-    public static HashSet<Character> arrayToHashSet(char[] arr) {
-        HashSet<Character> result = new HashSet<>();
+    public static Set<Character> arrayToHashSet(char[] arr) {
+        Set<Character> result = new HashSet<>();
         for (int i = 0; i < arr.length; ++i) {
             result.add(arr[i]);
         }
