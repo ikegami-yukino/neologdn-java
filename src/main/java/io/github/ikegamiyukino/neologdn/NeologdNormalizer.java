@@ -1,4 +1,4 @@
-package net.ddns.yukinoi.neologdn;
+package io.github.ikegamiyukino.neologdn;
 
 import java.util.HashMap;
 import java.util.HashSet;

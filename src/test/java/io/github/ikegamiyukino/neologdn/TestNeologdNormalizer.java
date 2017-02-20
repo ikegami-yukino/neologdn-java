@@ -1,10 +1,10 @@
-package net.ddns.yukinoi.neologdn;
+package io.github.ikegamiyukino.neologdn;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import net.ddns.yukinoi.neologdn.NeologdNormalizer;
+import io.github.ikegamiyukino.neologdn.NeologdNormalizer;
 
 public class TestNeologdNormalizer {
   NeologdNormalizer normalizer = new NeologdNormalizer();
