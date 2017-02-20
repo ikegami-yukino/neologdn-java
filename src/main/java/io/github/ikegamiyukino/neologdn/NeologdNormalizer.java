@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class NeologdNormalizer {
-    private final char[] HIPHENS = { '˗', '֊', '‐', '‑', '‒', '–', '⁃', '⁻', '₋', '−' };
-    private final char[] CHOONPUS = { '﹣', '－', 'ｰ', '—', '―', '─', '━', 'ー' };
-    private final char[] TILDES = { '~', '∼', '∾', '〜', '〰', '～' };
+    private static final char[] HIPHENS = { '˗', '֊', '‐', '‑', '‒', '–', '⁃', '⁻', '₋', '−' };
+    private static final char[] CHOONPUS = { '﹣', '－', 'ｰ', '—', '―', '─', '━', 'ー' };
+    private static final char[] TILDES = { '~', '∼', '∾', '〜', '〰', '～' };
     HashSet<Character> jpChars, basicLatin, hiphens, choonpus, tildes;
 
     HashMap<Character, Character> conversion_map = new HashMap<Character, Character>() {
@@ -118,6 +118,15 @@ public class NeologdNormalizer {
         }
     };
 
+    public NeologdNormalizer() {
+        jpChars = buildJpCharsBlock();
+        basicLatin = addCharsFromRange(new HashSet<>(), 0, 127);
+
+        hiphens = arrayToHashSet(HIPHENS);
+        choonpus = arrayToHashSet(CHOONPUS);
+        tildes = arrayToHashSet(TILDES);
+    }
+
     public String normalize(String sentence) {
         String result = "";
         Character prev = ' ';
@@ -173,7 +182,7 @@ public class NeologdNormalizer {
         return result;
     }
 
-    public HashSet<Character> addCharsFromRange(HashSet<Character> charSet, int start, int end) {
+    public static HashSet<Character> addCharsFromRange(HashSet<Character> charSet, int start, int end) {
         for (int i = start; i <= end; ++i) {
             String c = new String(new int[] { i }, 0, 1);
             charSet.add(c.charAt(0));
@@ -181,7 +190,7 @@ public class NeologdNormalizer {
         return charSet;
     }
 
-    public HashSet<Character> buildJpCharsBlock() {
+    public static HashSet<Character> buildJpCharsBlock() {
         HashSet<Character> jpChars = new HashSet<>();
         jpChars = addCharsFromRange(jpChars, 19968, 40959); // CJK UNIFIED
                                                            // IDEOGRAPHS
@@ -194,21 +203,11 @@ public class NeologdNormalizer {
         return jpChars;
     }
 
-    public HashSet<Character> arrayToHashSet(char[] arr) {
+    public static HashSet<Character> arrayToHashSet(char[] arr) {
         HashSet<Character> result = new HashSet<>();
         for (int i = 0; i < arr.length; ++i) {
             result.add(arr[i]);
         }
         return result;
-    }
-
-    public NeologdNormalizer() {
-        jpChars = buildJpCharsBlock();
-        basicLatin = addCharsFromRange(new HashSet<>(), 0, 127);
-
-
-        hiphens = arrayToHashSet(HIPHENS);
-        choonpus = arrayToHashSet(CHOONPUS);
-        tildes = arrayToHashSet(TILDES);
     }
 }
