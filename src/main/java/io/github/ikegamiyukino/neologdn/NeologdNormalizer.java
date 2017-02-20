@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class NeologdNormalizer {
-    private static final char[] HIPHENS = { '˗', '֊', '‐', '‑', '‒', '–', '⁃', '⁻', '₋', '−' };
+    private static final char[] HYPHENS = { '˗', '֊', '‐', '‑', '‒', '–', '⁃', '⁻', '₋', '−' };
     private static final char[] CHOONPUS = { '﹣', '－', 'ｰ', '—', '―', '─', '━', 'ー' };
     private static final char[] TILDES = { '~', '∼', '∾', '〜', '〰', '～' };
 
@@ -125,7 +125,7 @@ public class NeologdNormalizer {
         jpChars = buildJpCharsBlock();
         basicLatin = addCharsFromRange(new HashSet<>(), 0, 127);
 
-        hiphens = arrayToHashSet(HIPHENS);
+        hiphens = arrayToHashSet(HYPHENS);
         choonpus = arrayToHashSet(CHOONPUS);
         tildes = arrayToHashSet(TILDES);
     }
@@ -133,7 +133,7 @@ public class NeologdNormalizer {
     public String normalize(String sentence) {
         String result = "";
         Character prev = ' ';
-        boolean lattinSpace = false;
+        boolean latinSpace = false;
 
         for (int i = 0; i < sentence.length(); ++i) {
             char current = sentence.charAt(i);
@@ -143,7 +143,7 @@ public class NeologdNormalizer {
                 if (prev == ' ' | jpChars.contains(prev)) {
                     continue;
                 } else if (prev != '*' && i > 0 && basicLatin.contains(prev)) {
-                    lattinSpace = true;
+                    latinSpace = true;
                     result += current;
                 }
             } else {
@@ -173,10 +173,10 @@ public class NeologdNormalizer {
                     } else if (conversion_map.containsKey(current)) {
                         current = conversion_map.get(current);
                     }
-                    if (lattinSpace && jpChars.contains(current)) {
+                    if (latinSpace && jpChars.contains(current)) {
                         result = result.substring(0, result.length()-1);
                     }
-                    lattinSpace = false;
+                    latinSpace = false;
                     result += current;
                 }
             }
