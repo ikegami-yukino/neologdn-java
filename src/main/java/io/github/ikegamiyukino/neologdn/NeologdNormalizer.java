@@ -182,7 +182,7 @@ public class NeologdNormalizer {
     }
 
     public HashSet<Character> buildJpCharsBlock() {
-        HashSet<Character> jpChars = new HashSet<Character>();
+        HashSet<Character> jpChars = new HashSet<>();
         jpChars = addCharsFromRange(jpChars, 19968, 40959); // CJK UNIFIED
                                                            // IDEOGRAPHS
         jpChars = addCharsFromRange(jpChars, 12352, 12447); // HIRAGANA
@@ -195,7 +195,7 @@ public class NeologdNormalizer {
     }
 
     public HashSet<Character> arrayToHashSet(char[] arr) {
-        HashSet<Character> result = new HashSet<Character>();
+        HashSet<Character> result = new HashSet<>();
         for (int i = 0; i < arr.length; ++i) {
             result.add(arr[i]);
         }
@@ -204,7 +204,8 @@ public class NeologdNormalizer {
 
     public NeologdNormalizer() {
         jpChars = buildJpCharsBlock();
-        basicLatin = addCharsFromRange(new HashSet<Character>(), 0, 127);
+        basicLatin = addCharsFromRange(new HashSet<>(), 0, 127);
+
 
         hiphens = arrayToHashSet(HIPHENS);
         choonpus = arrayToHashSet(CHOONPUS);
