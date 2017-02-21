@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import io.github.ikegamiyukino.neologdn.NeologdNormalizer;
-
 public class TestNeologdNormalizer {
     NeologdNormalizer normalizer = new NeologdNormalizer();
 
@@ -36,7 +34,6 @@ public class TestNeologdNormalizer {
         assertEquals(normalizer.normalize("あ﹣－ｰ—―─━ー"), "あー");
         assertEquals(normalizer.normalize("チルダ~∼∾〜〰～"), "チルダ");
         assertEquals(normalizer.normalize("(ﾟ∀ﾟ )"), "(゜∀゜)");
-
+        assertEquals(normalizer.normalize("ﾊﾝｶｸﾀﾞｸﾃﾝ"), "ハンカクダクテン");
     }
-
 }
