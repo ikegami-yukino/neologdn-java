@@ -17,9 +17,9 @@ public class NeologdNormalizer {
             int halfwidthOffset = 33; // !
             int fullwidthOffset = 65281; // ！
             for (int i = 0; i <= 125; ++i) {
-                String fullwidthChar = new String(new int[] { i + fullwidthOffset }, 0, 1);
-                String halfwidthChar = new String(new int[] { i + halfwidthOffset }, 0, 1);
-                put(fullwidthChar.charAt(0), halfwidthChar.charAt(0));
+                Character fullwidthChar = charFromCodePoint(i + fullwidthOffset);
+                Character halfwidthChar = charFromCodePoint(i + halfwidthOffset);
+                put(fullwidthChar, halfwidthChar);
             }
             put('ｱ', 'ア');
             put('ｲ', 'イ');
@@ -123,7 +123,7 @@ public class NeologdNormalizer {
 
     public NeologdNormalizer() {
         jpChars = buildJpCharsBlock();
-        basicLatin = addCharsFromRange(new HashSet<Character>(), 0, 127);
+        basicLatin = charsFromRange(0, 127);
 
         hiphens = arrayToHashSet(HYPHENS);
         choonpus = arrayToHashSet(CHOONPUS);
@@ -185,22 +185,21 @@ public class NeologdNormalizer {
         return result;
     }
 
-    public static Set<Character> addCharsFromRange(Set<Character> charSet, int start, int end) {
+    public static Set<Character> charsFromRange(int start, int end) {
+        Set<Character> charSet = new HashSet<Character>();
         for (int i = start; i <= end; ++i) {
-            String c = new String(new int[] { i }, 0, 1);
-            charSet.add(c.charAt(0));
+            charSet.add(charFromCodePoint(i));
         }
         return charSet;
     }
 
     public static Set<Character> buildJpCharsBlock() {
-
         Set<Character> jpChars = new HashSet<Character>();
-        addCharsFromRange(jpChars, 19968, 40959); // CJK UNIFIED IDEOGRAPHS
-        addCharsFromRange(jpChars, 12352, 12447); // HIRAGANA
-        addCharsFromRange(jpChars, 12448, 12543); // KATAKANA
-        addCharsFromRange(jpChars, 12289, 12351); // CJK SYMBOLS AND PUNCTUATION
-        addCharsFromRange(jpChars, 65280, 65519); // HALFWIDTH AND FULLWIDTH FORMS
+        jpChars.addAll(charsFromRange(19968, 40959)); // CJK UNIFIED IDEOGRAPHS
+        jpChars.addAll(charsFromRange(12352, 12447)); // HIRAGANA
+        jpChars.addAll(charsFromRange(12448, 12543)); // KATAKANA
+        jpChars.addAll(charsFromRange(12289, 12351)); // CJK SYMBOLS AND PUNCTUATION
+        jpChars.addAll(charsFromRange(65280, 65519)); // HALFWIDTH AND FULLWIDTH FORMS
         return jpChars;
     }
 
@@ -210,5 +209,10 @@ public class NeologdNormalizer {
             result.add(arr[i]);
         }
         return result;
+    }
+
+    public static Character charFromCodePoint(int codePoint) {
+        String c = new String(new int[] { codePoint }, 0, 1);
+        return c.charAt(0);
     }
 }
