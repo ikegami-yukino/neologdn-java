@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.ikegamiyukino</groupId>
     <artifactId>neologdn</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>neologdn</name>
@@ -16,7 +15,13 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
-    </licenses>
+      </licenses>
+        <scm>
+        <url>https://github.com/ikegami-yukino/neologdn-java</url>
+        <connection>scm:git:git@github.com:ikegami-yukino/neologdn-java.git</connection>
+        <developerConnection>scm:git:git@github.com:ikegami-yukino/neologdn-java.git</developerConnection>
+      <tag>HEAD</tag>
+  </scm>
     <developers>
         <developer>
             <id>yukinoi</id>
@@ -24,7 +29,19 @@
             <email>yknikgm@gmail.com</email>
             <url>https://github.com/ikegami-yukino</url>
         </developer>
-    </developers>
+      </developers>
+
+      <distributionManagement>
+          <snapshotRepository>
+              <id>ossrh</id>
+              <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          </snapshotRepository>
+          <repository>
+              <id>ossrh</id>
+              <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+          </repository>
+      </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.6</java.version>
@@ -41,7 +58,17 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
-            </plugin>
+              </plugin>
+            <plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-release-plugin</artifactId>
+  <version>2.5.3</version>
+  <configuration>
+    <goals>deploy</goals>
+    <pushChanges>false</pushChanges>
+    <localCheckout>true</localCheckout>
+  </configuration>
+</plugin>
         </plugins>
     </build>
     <dependencies>
