@@ -7,5 +7,17 @@ The normalization is based on the neologd's rules: https://github.com/neologd/me
 
 Contributions are welcome!
 
+## Usage
+
+```java
+import io.github.ikegamiyukino.neologdn.NeologdNormalizer;
+
+
+NeologdNormalizer normalizer = new NeologdNormalizer();
+String text = "　　　ＰＲＭＬ　　副　読　本　　　";
+normalizer.normalize(text);
+// => "PRML副読本"
+```
+
 ## License
 Apache Software License.
