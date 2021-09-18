@@ -131,7 +131,7 @@ public class NeologdNormalizer {
     }
 
     public String normalize(String sentence) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         Character prev = ' ';
         boolean latinSpace = false;
 
@@ -144,7 +144,7 @@ public class NeologdNormalizer {
                     continue;
                 } else if (prev != '*' && i > 0 && basicLatin.contains(prev)) {
                     latinSpace = true;
-                    result += current;
+                    result.append(current);
                 }
             } else {
                 if (hiphens.contains(current)) {
@@ -152,37 +152,37 @@ public class NeologdNormalizer {
                         continue;
                     } else {
                         current = '-';
-                        result += current;
+                        result.append(current);
                     }
                 } else if (choonpus.contains(current)) {
                     if (prev == 'ー') {
                         continue;
                     } else {
                         current = 'ー';
-                        result += current;
+                        result.append(current);
                     }
                 } else if (tildes.contains(current)) {
                     continue;
                 } else {
                     if (current == 'ﾞ' && kana_ten_map.containsKey(prev)) {
-                        result = result.substring(0, result.length()-1);
+                        result.deleteCharAt(result.length()-1);
                         current = kana_ten_map.get(prev);
                     } else if (current == 'ﾟ' && kana_maru_map.containsKey(prev)) {
-                        result = result.substring(0, result.length()-1);
+                        result.deleteCharAt(result.length()-1);
                         current = kana_maru_map.get(prev);
                     } else if (conversion_map.containsKey(current)) {
                         current = conversion_map.get(current);
                     }
                     if (latinSpace && jpChars.contains(current)) {
-                        result = result.substring(0, result.length()-1);
+                        result.deleteCharAt(result.length()-1);
                     }
                     latinSpace = false;
-                    result += current;
+                    result.append(current);
                 }
             }
             prev = current;
         }
-        return result;
+        return result.toString();
     }
 
     public static Set<Character> charsFromRange(int start, int end) {
