@@ -93,6 +93,16 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-publish-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<scmBranch>gh-pages</scmBranch>
+					<pubScmUrl>scm:git:https://github.com/ikegami-yukino/neologdn-java.git</pubScmUrl>
+					<content>${project.build.directory}/site</content>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
