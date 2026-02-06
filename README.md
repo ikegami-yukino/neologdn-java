@@ -2,9 +2,9 @@
 
 [![](https://jitpack.io/v/ikegami-yukino/neologdn-java.svg)](https://jitpack.io/#ikegami-yukino/neologdn-java)
 
-neologdn is a Japanese text normalizer for mecab-neologd.
+`neologdn` is a Japanese text normalizer for [mecab-neologd](https://github.com/neologd/neologd).
 
-The normalization is based on the neologd's rules: [https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja](https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja)
+The normalization of `neologdn` is based on the neologd's rules: [https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja](https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja)
 
 Contributions are welcome!
 
@@ -22,7 +22,7 @@ normalizer.normalize(text);
 
 ## Installation
 
-neologdn has 2 ways to installation.
+`neologdn` can be added to your project through either JitPack or GitHub Packages.
 
 ### JitPack
 
