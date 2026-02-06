@@ -1,16 +1,32 @@
 # neologdn-java
 
+[![](https://jitpack.io/v/ikegami-yukino/neologdn-java.svg)](https://jitpack.io/#ikegami-yukino/neologdn-java)
+
 neologdn is a Japanese text normalizer for mecab-neologd.
 
-The normalization is based on the neologd's rules: https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja
+The normalization is based on the neologd's rules: [https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja](https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja)
 
 Contributions are welcome!
+
+## Usage
+
+```java
+import io.github.ikegamiyukino.neologdn.NeologdNormalizer;
+
+
+NeologdNormalizer normalizer = new NeologdNormalizer();
+String text = "　　　ＰＲＭＬ　　副　読　本　　　";
+normalizer.normalize(text);
+// => "PRML副読本"
+```
 
 ## Installation
 
 neologdn has 2 ways to installation.
 
 ### JitPack
+
+[JitPack Link](https://jitpack.io/#ikegami-yukino/neologdn-java/)
 
 #### maven
 
@@ -120,18 +136,6 @@ Add GitHub info to `~/.gradle/gradle.properties`:
 ```groovy
 gpr.user=Your GitHub account name
 gpr.key=Your Personal Access Token (classic)
-```
-
-## Usage
-
-```java
-import io.github.ikegamiyukino.neologdn.NeologdNormalizer;
-
-
-NeologdNormalizer normalizer = new NeologdNormalizer();
-String text = "　　　ＰＲＭＬ　　副　読　本　　　";
-normalizer.normalize(text);
-// => "PRML副読本"
 ```
 
 ## License
