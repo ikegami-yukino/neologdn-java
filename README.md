@@ -43,7 +43,7 @@ Add the following tags to your `pom.xml`:
 <dependency>
     <groupId>com.github.ikegami-yukino</groupId>
     <artifactId>neologdn-java</artifactId>
-    <version>v0.0.2</version>
+    <version>v0.0.3</version>
 </dependency>
 ```
 
@@ -65,7 +65,7 @@ Add the dependency
 
 ```groovy
 	dependencies {
-	        implementation 'com.github.ikegami-yukino:neologdn-java:v0.0.2'
+	        implementation 'com.github.ikegami-yukino:neologdn-java:v0.0.3'
 	}
 ```
 
@@ -81,7 +81,7 @@ Add the following tags to your `pom.xml`:
         <dependency>
             <groupId>com.github.ikegami-yukino</groupId>
             <artifactId>neologdn-java</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
         </dependency>
     </dependencies>
 
