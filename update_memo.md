@@ -30,3 +30,16 @@ git push origin v${NEW_VERSION}
 ```bash
 mvn clean site scm-publish:publish-scm
 ```
+
+## Update plugin version
+
+```bash
+mvn versions:update-properties
+```
+
+## Update dependencies
+
+```bash
+mvn versions:display-dependency-updates
+mvn versions:use-latest-releases
+```

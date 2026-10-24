@@ -16,11 +16,22 @@ public class NeologdNormalizer {
         {
             int halfwidthOffset = 33; // !
             int fullwidthOffset = 65281; // ！
-            for (int i = 0; i <= 125; ++i) {
+            for (int i = 0; i <= 93; ++i) {
                 Character fullwidthChar = charFromCodePoint(i + fullwidthOffset);
                 Character halfwidthChar = charFromCodePoint(i + halfwidthOffset);
                 put(fullwidthChar, halfwidthChar);
             }
+            // Python uses these quotation/currency characters rather than
+            // their fullwidth ASCII counterparts.
+            remove('＂');
+            remove('＇');
+            remove('＼');
+            remove('｀');
+            put('“', '\"');
+            put('”', '\"');
+            put('’', '\'');
+            put('‘', '`');
+            put('¥', '\\');
             put('ｱ', 'ア');
             put('ｲ', 'イ');
             put('ｳ', 'ウ');
@@ -79,8 +90,8 @@ public class NeologdNormalizer {
             put('｡', '。');
             put('､', '、');
             put('･', '・');
-            put('ﾞ', '゛');
-            put('ﾟ', '゜');
+            put('゛', 'ﾞ');
+            put('゜', 'ﾟ');
             put('｢', '「');
             put('｣', '」');
             put('ｰ', 'ー');
@@ -109,6 +120,7 @@ public class NeologdNormalizer {
             put('ヘ', 'ベ');
             put('ホ', 'ボ');
             put('ウ', 'ヴ');
+            put('う', 'ゔ');
         }
     };
     Map<Character, Character> kana_maru_map = new HashMap<Character, Character>() {
@@ -118,6 +130,11 @@ public class NeologdNormalizer {
             put('フ', 'プ');
             put('ヘ', 'ペ');
             put('ホ', 'ポ');
+            put('は', 'ぱ');
+            put('ひ', 'ぴ');
+            put('ふ', 'ぷ');
+            put('へ', 'ぺ');
+            put('ほ', 'ぽ');
         }
     };
 
@@ -130,59 +147,231 @@ public class NeologdNormalizer {
         tildes = arrayToHashSet(TILDES);
     }
 
+    /**
+     * Normalizes text using the defaults of Python neologdn 0.5.6.
+     * @param sentence input text (not null)
+     * @return normalized text
+     */
     public String normalize(String sentence) {
-        StringBuilder result = new StringBuilder();
-        Character prev = ' ';
+        return normalize(sentence, 0, true, 8, "remove");
+    }
+
+    /**
+     * Normalizes text and shortens repeated substrings.
+     * @param sentence input text
+     * @param repeat maximum repetitions to retain; zero disables shortening
+     * @return normalized text
+     */
+    public String normalize(String sentence, int repeat) {
+        return normalize(sentence, repeat, true, 8, "remove");
+    }
+
+    /**
+     * Normalizes text with configurable Japanese space removal.
+     * @param sentence input text
+     * @param removeSpace whether to remove spaces around Japanese characters
+     * @return normalized text
+     */
+    public String normalize(String sentence, boolean removeSpace) {
+        return normalize(sentence, 0, removeSpace, 8, "remove");
+    }
+
+    /**
+     * Normalizes text with configurable tilde handling.
+     * @param sentence input text
+     * @param tilde "remove", "ignore", "normalize", or "normalize_zenkaku"
+     * @return normalized text
+     */
+    public String normalize(String sentence, String tilde) {
+        return normalize(sentence, 0, true, 8, tilde);
+    }
+
+    /**
+     * Normalizes text with repetition and space options.
+     * @param sentence input text
+     * @param repeat maximum repetitions to retain; zero disables shortening
+     * @param removeSpace whether to remove spaces around Japanese characters
+     * @return normalized text
+     */
+    public String normalize(String sentence, int repeat, boolean removeSpace) {
+        return normalize(sentence, repeat, removeSpace, 8, "remove");
+    }
+
+    /**
+     * Normalizes text with a limit on repeated substring length.
+     * @param sentence input text
+     * @param repeat maximum repetitions to retain; zero disables shortening
+     * @param removeSpace whether to remove spaces around Japanese characters
+     * @param maxRepeatSubstringLength maximum substring length in code points; zero means unlimited
+     * @return normalized text
+     */
+    public String normalize(String sentence, int repeat, boolean removeSpace, int maxRepeatSubstringLength) {
+        return normalize(sentence, repeat, removeSpace, maxRepeatSubstringLength, "remove");
+    }
+
+    /**
+     * Normalizes text with the options of Python neologdn 0.5.6, in the same order.
+     * Fullwidth spaces become ASCII spaces even when removal is disabled.
+     * As in Python, one trailing ASCII space is removed regardless of removeSpace.
+     *
+     * @param sentence input text (not null)
+     * @param repeat maximum repetitions to retain; zero disables shortening
+     * @param removeSpace whether to remove spaces around Japanese characters
+     * @param maxRepeatSubstringLength maximum substring length in code points; zero means unlimited
+     * @param tilde "ignore" preserves tildes, "normalize" maps to '~',
+     *              "normalize_zenkaku" maps to '〜'; other values remove tildes
+     * @return normalized text
+     * @throws IllegalArgumentException if a repetition parameter is negative
+     */
+    public String normalize(String sentence, int repeat, boolean removeSpace,
+                            int maxRepeatSubstringLength, String tilde) {
+        checkRepeatParameters(repeat, maxRepeatSubstringLength);
+        int[] result = new int[sentence.codePointCount(0, sentence.length())];
+        int pos = 0;
+        int prev = 0;
         boolean latinSpace = false;
 
-        for (int i = 0; i < sentence.length(); ++i) {
-            char current = sentence.charAt(i);
-
+        for (int i = 0; i < sentence.length();) {
+            int current = sentence.codePointAt(i);
+            i += Character.charCount(current);
             if (current == ' ' || current == '　') {
                 current = ' ';
-                if (prev == ' ' || jpChars.contains(prev)) {
+                if ((pos == 0 || prev == ' ' || contains(jpChars, prev)) && removeSpace) {
                     continue;
-                } else if (prev != '*' && i > 0 && basicLatin.contains(prev)) {
+                } else if (prev != '*' && pos > 0 && contains(basicLatin, prev)) {
                     latinSpace = true;
-                    result.append(current);
+                    result[pos] = current;
+                } else if (removeSpace) {
+                    // Match Python's space handling after non-Latin characters.
+                    if (pos > 0) {
+                        pos--;
+                    }
+                } else {
+                    result[pos] = current;
                 }
             } else {
-                if (hiphens.contains(current)) {
+                if (contains(hiphens, current)) {
                     if (prev == '-') {
                         continue;
-                    } else {
-                        current = '-';
-                        result.append(current);
                     }
-                } else if (choonpus.contains(current)) {
+                    result[pos] = current = '-';
+                    latinSpace = false;
+                } else if (contains(choonpus, current)) {
                     if (prev == 'ー') {
                         continue;
+                    }
+                    result[pos] = current = 'ー';
+                    latinSpace = false;
+                } else if (contains(tildes, current)) {
+                    if ("ignore".equals(tilde)) {
+                        result[pos] = current;
+                    } else if ("normalize".equals(tilde)) {
+                        result[pos] = current = '~';
+                    } else if ("normalize_zenkaku".equals(tilde)) {
+                        result[pos] = current = '〜';
                     } else {
-                        current = 'ー';
-                        result.append(current);
-                    }
-                } else if (tildes.contains(current)) {
-                    continue;
-                } else {
-                    if (current == 'ﾞ' && kana_ten_map.containsKey(prev)) {
-                        result.deleteCharAt(result.length()-1);
-                        current = kana_ten_map.get(prev);
-                    } else if (current == 'ﾟ' && kana_maru_map.containsKey(prev)) {
-                        result.deleteCharAt(result.length()-1);
-                        current = kana_maru_map.get(prev);
-                    } else if (conversion_map.containsKey(current)) {
-                        current = conversion_map.get(current);
-                    }
-                    if (latinSpace && jpChars.contains(current)) {
-                        result.deleteCharAt(result.length()-1);
+                        continue;
                     }
                     latinSpace = false;
-                    result.append(current);
+                } else {
+                    if (current <= Character.MAX_VALUE && conversion_map.containsKey((char) current)) {
+                        current = conversion_map.get((char) current);
+                    }
+                    if (current == 'ﾞ' && pos > 0 && prev <= Character.MAX_VALUE
+                            && kana_ten_map.containsKey((char) prev)) {
+                        pos--;
+                        current = kana_ten_map.get((char) prev);
+                    } else if (current == 'ﾟ' && pos > 0 && prev <= Character.MAX_VALUE
+                            && kana_maru_map.containsKey((char) prev)) {
+                        pos--;
+                        current = kana_maru_map.get((char) prev);
+                    }
+                    if (latinSpace && pos > 0 && contains(jpChars, current) && removeSpace) {
+                        pos--;
+                    }
+                    latinSpace = false;
+                    result[pos] = current;
                 }
             }
             prev = current;
+            pos++;
         }
-        return result.toString();
+        if (pos > 0 && result[pos - 1] == ' ') {
+            pos--;
+        }
+        // Python decodes its buffer as UTF-32, consuming one leading byte order mark.
+        int start = pos > 0 && result[0] == 0xFEFF ? 1 : 0;
+        String normalized = new String(result, start, pos - start);
+        return repeat == 0 ? normalized : shortenRepeat(normalized, repeat, maxRepeatSubstringLength);
+    }
+
+    /**
+     * Shortens repeated substrings of up to eight Unicode code points without normalization.
+     * @param text input text (not null)
+     * @param repeatThreshold maximum repetitions to retain
+     * @return shortened text
+     */
+    public String shortenRepeat(String text, int repeatThreshold) {
+        return shortenRepeat(text, repeatThreshold, 8);
+    }
+
+    /**
+     * Shortens repeated substrings using Python neologdn 0.5.6's scan order and bounds.
+     * In particular, very short repeats such as "aa", "aaa", and "abab" are unchanged
+     * with a threshold of one. This method does not normalize the input first.
+     *
+     * @param text input text (not null)
+     * @param repeatThreshold maximum repetitions to retain; zero removes scanned substrings
+     * @param maxRepeatSubstringLength maximum substring length in code points; zero means unlimited
+     * @return shortened text
+     * @throws IllegalArgumentException if a repetition parameter is negative
+     */
+    public String shortenRepeat(String text, int repeatThreshold, int maxRepeatSubstringLength) {
+        checkRepeatParameters(repeatThreshold, maxRepeatSubstringLength);
+        int[] buffer = text.codePoints().toArray();
+        int length = buffer.length;
+        for (int i = 0; i < length; i++) {
+            int upper = (length - i) / 2;
+            if (maxRepeatSubstringLength != 0 && maxRepeatSubstringLength < upper) {
+                upper = maxRepeatSubstringLength + 1;
+            }
+            // The exclusive upper bound and its calculation before the inner loop
+            // intentionally match Python, including after a previous length shrinks text.
+            for (int size = 1; size < upper && i < length; size++) {
+                int count = 1;
+                int right = i + size;
+                while (size <= length - right && equalSubstring(buffer, i, right, size)) {
+                    count++;
+                    right += size;
+                }
+                if (count > repeatThreshold) {
+                    int start = i + size * repeatThreshold;
+                    int end = Math.min(right, length);
+                    System.arraycopy(buffer, end, buffer, start, length - end);
+                    length -= end - start;
+                }
+            }
+        }
+        return new String(buffer, 0, length);
+    }
+
+    private static boolean equalSubstring(int[] text, int left, int right, int length) {
+        for (int j = 0; j < length; j++) {
+            if (text[left + j] != text[right + j]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void checkRepeatParameters(int repeat, int maxRepeatSubstringLength) {
+        if (repeat < 0 || maxRepeatSubstringLength < 0) {
+            throw new IllegalArgumentException("Repetition parameters must be non-negative");
+        }
+    }
+
+    private static boolean contains(Set<Character> chars, int codePoint) {
+        return codePoint <= Character.MAX_VALUE && chars.contains((char) codePoint);
     }
 
     public static Set<Character> charsFromRange(int start, int end) {
